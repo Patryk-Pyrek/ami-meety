@@ -152,14 +152,22 @@ const Index: React.FC = () => {
 
           {/* Activities */}
           {gameState === 'activities' && (
-            <div className="text-center space-y-8">
-              <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
-                {getCurrentActivities().map((act, i) => (
-                  <ActivityCard
-                    key={act.id}
-                    title={`${act.emoji} ${act.text}`}
-                    isRevealed={revealedCards.has(i)}
+  <div className="text-center space-y-8">
+    <h2 className="text-3xl font-bold holographic">Wylosuj aktywność!</h2>
+    <div className="flex justify-center">
+      <ActivityCard
+        title={selectedActivityText || '❓'}
+        isRevealed={revealedCards.has(0)}
+        onClick={() => {
+          if (revealedCards.has(0)) return;
+          const pool = getCurrentActivities();
+          const choice = pool[Math.floor(Math.random() * pool.length)];
+          handleCardReveal(0, undefined, `${choice.emoji} ${choice.text}`);
+        }}
+      />
+    </div>
+  </div>
+)}
                     onClick={() => handleCardReveal(i, act.id, `${act.emoji} ${act.text}`)}
                   />
                 ))}
