@@ -11,8 +11,15 @@ import {
   outsideActivities
 } from '../data/activities';
 
-type GameState = 'questions' | 'main-category' | 'activities' | 'sub-activities' | 'result' | 'food-drink';
+type GameState =
+  | 'questions'
+  | 'main-category'
+  | 'activities'
+  | 'sub-activities'
+  | 'result'
+  | 'food-drink';
 type TimeChoice = 'short' | 'medium' | 'long';
+type Activity = { id: string; text: string; emoji: string };
 
 const Index: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('questions');
@@ -25,6 +32,7 @@ const Index: React.FC = () => {
   const [subOptions, setSubOptions] = useState<string[]>([]);
   const [selectedSubOption, setSelectedSubOption] = useState<string>('');
   const [shuffledCategories, setShuffledCategories] = useState(mainCategories);
+  const [currentActivities, setCurrentActivities] = useState<Activity[]>([]);
 
   // Tasowanie kategorii przy starcie i resecie
   useEffect(() => {
@@ -49,7 +57,9 @@ const Index: React.FC = () => {
 
     setTimeout(() => {
       if (gameState === 'main-category') {
-        setSelectedCategory(cardId || '');
+        const category = cardId || '';
+        setSelectedCategory(category);
+        setCurrentActivities(generateActivities(category));
         setGameState('activities');
         setRevealedCards(new Set());
       } else if (gameState === 'activities') {
@@ -70,10 +80,10 @@ const Index: React.FC = () => {
     return [activityText];
   };
 
-  const getCurrentActivities = () => {
+  const generateActivities = (categoryId: string) => {
     const time = answers.time as TimeChoice;
-    const activities = selectedCategory === 'home' ? homeActivities : outsideActivities;
-    return activities[time]() || activities.short();
+    const activitiesSrc = categoryId === 'home' ? homeActivities : outsideActivities;
+    return activitiesSrc[time]() || activitiesSrc.short();
   };
 
   const resetGame = () => {
@@ -86,6 +96,7 @@ const Index: React.FC = () => {
     setSelectedActivityText('');
     setSubOptions([]);
     setSelectedSubOption('');
+    setCurrentActivities([]);
   };
 
   const goToFoodDrink = () => setGameState('food-drink');
@@ -126,8 +137,13 @@ const Index: React.FC = () => {
             <div className="text-center space-y-8">
               <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
-                {getCurrentActivities().map((act, idx) => (
-                  <ActivityCard key={`${act.id}-${idx}`} title={`${act.emoji} ${act.text}`} isRevealed={revealedCards.has(idx)} onClick={() => handleCardReveal(idx, act.id, act.text)} />
+                {currentActivities.map((act, idx) => (
+                  <ActivityCard
+                    key={`${act.id}-${idx}`}
+                    title={`${act.emoji} ${act.text}`}
+                    isRevealed={revealedCards.has(idx)}
+                    onClick={() => handleCardReveal(idx, act.id, act.text)}
+                  />
                 ))}
               </div>
             </div>
