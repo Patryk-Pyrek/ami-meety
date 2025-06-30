@@ -57,7 +57,7 @@ const Index = () => {
       } else if (gameState === 'sub-activities') {
         setGameState('result');
       }
-    }, 1500);
+    }, 2000);
   };
 
   const handleActivitySelection = (activityId: string) => {
@@ -97,7 +97,7 @@ const Index = () => {
   const getCurrentActivities = () => {
     const timeChoice = answers.time as TimeChoice;
     const activities = selectedCategory === 'home' ? homeActivities : outsideActivities;
-    return activities[timeChoice] || activities.short;
+    return activities[timeChoice]() || activities.short();
   };
 
   const resetGame = () => {
@@ -115,7 +115,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen y2k-bg flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen y2k-bg flex flex-col items-center justify-center p-4 font-quicksand">
       <div className="max-w-6xl w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -178,7 +178,7 @@ const Index = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {getCurrentActivities().map((activity, index) => (
                   <ActivityCard
-                    key={`${activity.id}-${index}`}
+                    key={`${activity.id}-${index}-${Math.random()}`}
                     title={`${activity.emoji} ${activity.text}`}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index, activity.id)}
@@ -196,7 +196,7 @@ const Index = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {subOptions.map((option, index) => (
                   <ActivityCard
-                    key={index}
+                    key={`${option}-${index}-${Math.random()}`}
                     title={option}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index)}

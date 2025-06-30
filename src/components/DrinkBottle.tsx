@@ -1,19 +1,11 @@
 
 import React, { useState } from 'react';
 import { Droplet } from 'lucide-react';
+import { drinks } from '../data/activities';
 
 const DrinkBottle: React.FC = () => {
   const [isShaking, setIsShaking] = useState(false);
   const [result, setResult] = useState<string>('');
-
-  const drinks = [
-    'Bubble Tea 🧋', 'Cola 🥤', 'Lipton 🍃', 'Sprite 💚', 'Fanta 🍊',
-    'Red Bull 🔴', 'Monster 👹', 'Kawę ☕', 'Herbata 🍵', 'Smoothie 🥤',
-    'Lemoniada 🍋', 'Woda z cytryną 💧', 'Kombucha 🍄', 'Matcha 🍵', 'Frappé ❄️',
-    'Milkshake 🥛', 'Sok jabłkowy 🍎', 'Sok pomarańczowy 🍊', 'Energy drink ⚡', 'Icetea 🧊',
-    'Cappuccino ☕', 'Latte 🤎', 'Americano ⚫', 'Espresso ☕', 'Machiato 🤍',
-    'Wodę gazowaną 💧', 'Wodę niegazowaną 💧', 'Kombucha imbirowa 🫚', 'Chai latte 🧡', 'Hot chocolate 🍫'
-  ];
 
   const shakeDrink = () => {
     if (isShaking) return;

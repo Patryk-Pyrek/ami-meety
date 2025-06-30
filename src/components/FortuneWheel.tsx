@@ -1,16 +1,10 @@
 
 import React, { useState } from 'react';
+import { foods } from '../data/activities';
 
 const FortuneWheel: React.FC = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<string>('');
-
-  const foods = [
-    'Sushi 🍣', 'Burger 🍔', 'Makaron 🍝', 'Pizza 🍕', 'Tacos 🌮',
-    'Ramen 🍜', 'Kebab 🥙', 'Pierogi 🥟', 'Naleśniki 🥞', 'Zapiekanka 🥖',
-    'Salad 🥗', 'Sandwich 🥪', 'Bagel 🥯', 'Hot Dog 🌭', 'Falafel 🧆',
-    'Curry 🍛', 'Paella 🥘', 'Risotto 🍚', 'Dim Sum 🥠', 'Pho 🍲'
-  ];
 
   const spin = () => {
     if (isSpinning) return;
