@@ -21,6 +21,7 @@ const Index: React.FC = () => {
   const [revealedCards, setRevealedCards] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedActivity, setSelectedActivity] = useState<string>('');
+  const [selectedActivityText, setSelectedActivityText] = useState<string>('');
   const [subOptions, setSubOptions] = useState<string[]>([]);
   const [selectedSubOption, setSelectedSubOption] = useState<string>('');
   const [shuffledCategories, setShuffledCategories] = useState(mainCategories);
@@ -53,6 +54,7 @@ const Index: React.FC = () => {
         setRevealedCards(new Set());
       } else if (gameState === 'activities') {
         setSelectedActivity(cardId || '');
+        setSelectedActivityText(cardText || '');
         setSubOptions(generateSubOptions(cardId || '', cardText || ''));
         setGameState('sub-activities');
         setRevealedCards(new Set());
@@ -64,10 +66,8 @@ const Index: React.FC = () => {
   };
 
   // Tworzy format: czas-typAktywności-lokalizacja-nazwa
-  const generateSubOptions = (activityId: string, activityText: string) => {
-    const time = answers.time as TimeChoice;
-    const location = selectedCategory;
-    return [`${time}-${activityId}-${location}-${activityText}`];
+  const generateSubOptions = (_activityId: string, activityText: string) => {
+    return [activityText];
   };
 
   const getCurrentActivities = () => {
@@ -83,6 +83,7 @@ const Index: React.FC = () => {
     setRevealedCards(new Set());
     setSelectedCategory('');
     setSelectedActivity('');
+    setSelectedActivityText('');
     setSubOptions([]);
     setSelectedSubOption('');
   };
@@ -147,7 +148,7 @@ const Index: React.FC = () => {
             <div className="text-center space-y-8">
               <h2 className="text-4xl font-bold holographic">Świetny wybór! 🎉</h2>
               <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
-                <p className="text-2xl mb-4">Plan: <strong>{selectedSubOption}</strong></p>
+                <p className="text-2xl mb-4">Plan: <strong>{selectedSubOption || selectedActivityText}</strong></p>
               </div>
               <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">Zagraj ponownie! 🎮</button>
             </div>
