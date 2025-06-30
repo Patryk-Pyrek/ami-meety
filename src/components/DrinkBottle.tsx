@@ -24,12 +24,16 @@ const DrinkBottle: React.FC = () => {
     <div className="flex flex-col items-center space-y-6">
       <h3 className="text-2xl font-bold holographic">Losowanie Napoju!</h3>
       
-      <div 
-        className={`cursor-pointer transform transition-transform hover:scale-110 ${isShaking ? 'bottle-shake' : ''}`}
-        onClick={shakeDrink}
-      >
-        <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-200 to-blue-400 rounded-full neon-glow">
-          <Droplet size={48} className="text-blue-600" />
+      <div className="relative">
+        <div 
+          className={`w-64 h-64 rounded-full border-8 border-blue-300 bg-gradient-to-r from-blue-200 via-cyan-300 to-blue-400 flex items-center justify-center cursor-pointer neon-glow ${isShaking ? 'bottle-shake' : ''}`}
+          onClick={shakeDrink}
+        >
+          <Droplet size={80} className="text-blue-600" />
+        </div>
+        
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2">
+          <div className="w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-cyan-400"></div>
         </div>
       </div>
 

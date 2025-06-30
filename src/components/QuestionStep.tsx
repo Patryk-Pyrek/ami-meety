@@ -17,13 +17,15 @@ interface QuestionStepProps {
 }
 
 const QuestionStep: React.FC<QuestionStepProps> = ({ question, onAnswer }) => {
+  const isTimeQuestion = question.id === 'time';
+  
   return (
     <div className="flex flex-col items-center space-y-8">
       <h2 className="text-3xl font-bold holographic text-center">
         {question.question}
       </h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+      <div className={`${isTimeQuestion ? 'flex flex-wrap justify-center gap-4' : 'grid grid-cols-1 md:grid-cols-2 gap-6'} max-w-4xl`}>
         {question.options.map((option) => (
           <button
             key={option.id}

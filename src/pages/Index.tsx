@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import QuestionStep from '../components/QuestionStep';
 import ActivityCard from '../components/ActivityCard';
@@ -24,7 +25,15 @@ const Index = () => {
   const [revealedCards, setRevealedCards] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedActivity, setSelectedActivity] = useState<string>('');
+  const [selectedActivityText, setSelectedActivityText] = useState<string>('');
   const [subOptions, setSubOptions] = useState<string[]>([]);
+  const [shuffledCategories, setShuffledCategories] = useState(mainCategories);
+
+  useEffect(() => {
+    // Shuffle categories when component mounts or game resets
+    const shuffled = [...mainCategories].sort(() => Math.random() - 0.5);
+    setShuffledCategories(shuffled);
+  }, [gameState === 'questions']);
 
   const handleAnswer = (answerId: string) => {
     const currentQuestion = initialQuestions[currentQuestionIndex];
@@ -39,7 +48,7 @@ const Index = () => {
     }
   };
 
-  const handleCardReveal = (index: number, cardId?: string) => {
+  const handleCardReveal = (index: number, cardId?: string, cardText?: string) => {
     if (revealedCards.has(index)) return;
 
     const newRevealed = new Set(revealedCards);
@@ -53,6 +62,7 @@ const Index = () => {
         setRevealedCards(new Set());
       } else if (gameState === 'activities') {
         setSelectedActivity(cardId || '');
+        setSelectedActivityText(cardText || '');
         handleActivitySelection(cardId || '');
       } else if (gameState === 'sub-activities') {
         setGameState('result');
@@ -107,7 +117,11 @@ const Index = () => {
     setRevealedCards(new Set());
     setSelectedCategory('');
     setSelectedActivity('');
+    setSelectedActivityText('');
     setSubOptions([]);
+    // Shuffle categories again
+    const shuffled = [...mainCategories].sort(() => Math.random() - 0.5);
+    setShuffledCategories(shuffled);
   };
 
   const goToFoodDrink = () => {
@@ -123,7 +137,7 @@ const Index = () => {
             💖 Randka z Amelką 💖
           </h1>
           <p className="text-xl text-gray-700 glass-effect p-4 rounded-lg">
-            Interaktywna strona do wybierania aktywności dla Amelki! ✨
+            ✨ Super aktywności z Amelką! ✨
           </p>
         </div>
 
@@ -158,7 +172,7 @@ const Index = () => {
                 Gdzie chcecie spędzić czas?
               </h2>
               <div className="flex justify-center space-x-8">
-                {mainCategories.map((category, index) => (
+                {shuffledCategories.map((category, index) => (
                   <ActivityCard
                     key={category.id}
                     title={`${category.emoji} ${category.text}`}
@@ -181,7 +195,7 @@ const Index = () => {
                     key={`${activity.id}-${index}-${Math.random()}`}
                     title={`${activity.emoji} ${activity.text}`}
                     isRevealed={revealedCards.has(index)}
-                    onClick={() => handleCardReveal(index, activity.id)}
+                    onClick={() => handleCardReveal(index, activity.id, `${activity.emoji} ${activity.text}`)}
                   />
                 ))}
               </div>
@@ -216,7 +230,7 @@ const Index = () => {
                   Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:
                 </p>
                 <p className="text-xl">
-                  {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivity}
+                  {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivityText || selectedActivity}
                 </p>
                 {subOptions.length > 0 && (
                   <p className="text-lg mt-4 opacity-90">
