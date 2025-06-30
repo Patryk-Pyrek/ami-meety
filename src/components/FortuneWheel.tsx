@@ -31,7 +31,7 @@ const FortuneWheel: React.FC = () => {
       
       <div className="relative">
         <div 
-          className={`w-64 h-64 rounded-full border-8 border-pink-500 bg-gradient-to-r from-pink-400 via-purple-500 to-cyan-400 flex items-center justify-center cursor-pointer neon-glow ${isSpinning ? 'spin-wheel' : ''}`}
+          className={`w-64 h-64 rounded-full border-8 border-pink-300 bg-gradient-to-r from-pink-200 via-rose-300 to-pink-400 flex items-center justify-center cursor-pointer neon-glow ${isSpinning ? 'spin-wheel' : ''}`}
           onClick={spin}
         >
           <div className="text-6xl">🎯</div>
@@ -43,7 +43,7 @@ const FortuneWheel: React.FC = () => {
       </div>
 
       {result && (
-        <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-4 rounded-lg text-xl font-bold neon-glow">
+        <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-4 rounded-lg text-xl font-bold neon-glow">
           {result}
         </div>
       )}

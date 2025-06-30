@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Droplet } from 'lucide-react';
 
 const DrinkBottle: React.FC = () => {
   const [isShaking, setIsShaking] = useState(false);
@@ -9,7 +10,9 @@ const DrinkBottle: React.FC = () => {
     'Bubble Tea 🧋', 'Cola 🥤', 'Lipton 🍃', 'Sprite 💚', 'Fanta 🍊',
     'Red Bull 🔴', 'Monster 👹', 'Kawę ☕', 'Herbata 🍵', 'Smoothie 🥤',
     'Lemoniada 🍋', 'Woda z cytryną 💧', 'Kombucha 🍄', 'Matcha 🍵', 'Frappé ❄️',
-    'Milkshake 🥛', 'Sok jabłkowy 🍎', 'Sok pomarańczowy 🍊', 'Energy drink ⚡', 'Icetea 🧊'
+    'Milkshake 🥛', 'Sok jabłkowy 🍎', 'Sok pomarańczowy 🍊', 'Energy drink ⚡', 'Icetea 🧊',
+    'Cappuccino ☕', 'Latte 🤎', 'Americano ⚫', 'Espresso ☕', 'Machiato 🤍',
+    'Wodę gazowaną 💧', 'Wodę niegazowaną 💧', 'Kombucha imbirowa 🫚', 'Chai latte 🧡', 'Hot chocolate 🍫'
   ];
 
   const shakeDrink = () => {
@@ -22,7 +25,7 @@ const DrinkBottle: React.FC = () => {
       const randomDrink = drinks[Math.floor(Math.random() * drinks.length)];
       setResult(randomDrink);
       setIsShaking(false);
-    }, 1000);
+    }, 1200);
   };
 
   return (
@@ -33,11 +36,13 @@ const DrinkBottle: React.FC = () => {
         className={`cursor-pointer transform transition-transform hover:scale-110 ${isShaking ? 'bottle-shake' : ''}`}
         onClick={shakeDrink}
       >
-        <div className="text-8xl neon-glow">🍼</div>
+        <div className="flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-200 to-blue-400 rounded-full neon-glow">
+          <Droplet size={48} className="text-blue-600" />
+        </div>
       </div>
 
       {result && (
-        <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 rounded-lg text-xl font-bold neon-glow">
+        <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-4 rounded-lg text-xl font-bold neon-glow">
           {result}
         </div>
       )}

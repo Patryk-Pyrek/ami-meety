@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import QuestionStep from '../components/QuestionStep';
 import ActivityCard from '../components/ActivityCard';
@@ -58,7 +57,7 @@ const Index = () => {
       } else if (gameState === 'sub-activities') {
         setGameState('result');
       }
-    }, 600);
+    }, 1500);
   };
 
   const handleActivitySelection = (activityId: string) => {
@@ -123,22 +122,22 @@ const Index = () => {
           <h1 className="text-6xl font-bold holographic mb-4">
             💖 Randka z Amelką 💖
           </h1>
-          <p className="text-xl text-white glass-effect p-4 rounded-lg">
+          <p className="text-xl text-gray-700 glass-effect p-4 rounded-lg">
             Interaktywna strona do wybierania aktywności dla Amelki! ✨
           </p>
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-center space-x-4 mb-8">
+        <div className="flex justify-center space-x-6 mb-8">
           <button
             onClick={resetGame}
-            className="cyber-button px-6 py-3 rounded-lg text-white font-bold hover:scale-105 transition-all"
+            className="cyber-button px-8 py-4 rounded-lg text-white font-bold hover:scale-105 transition-all min-w-[160px]"
           >
             🎯 Nowa gra
           </button>
           <button
             onClick={goToFoodDrink}
-            className="cyber-button px-6 py-3 rounded-lg text-white font-bold hover:scale-105 transition-all"
+            className="cyber-button px-8 py-4 rounded-lg text-white font-bold hover:scale-105 transition-all min-w-[160px]"
           >
             🍕🥤 Jedzenie & Napoje
           </button>
@@ -165,7 +164,6 @@ const Index = () => {
                     title={`${category.emoji} ${category.text}`}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index, category.id)}
-                    gradient={category.gradient}
                   />
                 ))}
               </div>
@@ -177,14 +175,13 @@ const Index = () => {
               <h2 className="text-3xl font-bold holographic">
                 Wybierz aktywność!
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {getCurrentActivities().map((activity, index) => (
                   <ActivityCard
-                    key={activity.id}
+                    key={`${activity.id}-${index}`}
                     title={`${activity.emoji} ${activity.text}`}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index, activity.id)}
-                    gradient={activity.gradient}
                   />
                 ))}
               </div>
@@ -196,14 +193,13 @@ const Index = () => {
               <h2 className="text-3xl font-bold holographic">
                 Wybierz szczegóły!
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {subOptions.map((option, index) => (
                   <ActivityCard
                     key={index}
                     title={option}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index)}
-                    gradient="bg-gradient-to-br from-pink-400 to-purple-600"
                   />
                 ))}
               </div>
@@ -215,7 +211,7 @@ const Index = () => {
               <h2 className="text-4xl font-bold holographic">
                 Świetny wybór! 🎉
               </h2>
-              <div className="bg-gradient-to-r from-pink-500 to-purple-600 text-white p-8 rounded-xl neon-glow">
+              <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
                 <p className="text-2xl mb-4">
                   Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:
                 </p>
