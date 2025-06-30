@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import QuestionStep from '../components/QuestionStep';
 import ActivityCard from '../components/ActivityCard';
@@ -18,7 +17,7 @@ import {
 type GameState = 'questions' | 'main-category' | 'activities' | 'sub-activities' | 'result' | 'food-drink';
 type TimeChoice = 'short' | 'medium' | 'long';
 
-const Index = () => {
+const Index: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>('questions');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -27,6 +26,7 @@ const Index = () => {
   const [selectedActivity, setSelectedActivity] = useState<string>('');
   const [selectedActivityText, setSelectedActivityText] = useState<string>('');
   const [subOptions, setSubOptions] = useState<string[]>([]);
+  const [selectedSubOption, setSelectedSubOption] = useState<string>('');
   const [shuffledCategories, setShuffledCategories] = useState(mainCategories);
 
   useEffect(() => {
@@ -48,7 +48,11 @@ const Index = () => {
     }
   };
 
-  const handleCardReveal = (index: number, cardId?: string, cardText?: string) => {
+  const handleCardReveal = (
+    index: number,
+    cardId?: string,
+    cardText?: string
+  ) => {
     if (revealedCards.has(index)) return;
 
     const newRevealed = new Set(revealedCards);
@@ -65,6 +69,7 @@ const Index = () => {
         setSelectedActivityText(cardText || '');
         handleActivitySelection(cardId || '');
       } else if (gameState === 'sub-activities') {
+        setSelectedSubOption(cardText || '');
         setGameState('result');
       }
     }, 2000);
@@ -119,6 +124,7 @@ const Index = () => {
     setSelectedActivity('');
     setSelectedActivityText('');
     setSubOptions([]);
+    setSelectedSubOption('');
     // Shuffle categories again
     const shuffled = [...mainCategories].sort(() => Math.random() - 0.5);
     setShuffledCategories(shuffled);
@@ -177,7 +183,7 @@ const Index = () => {
                     key={category.id}
                     title={`${category.emoji} ${category.text}`}
                     isRevealed={revealedCards.has(index)}
-                    onClick={() => handleCardReveal(index, category.id)}
+                    onClick={() => handleCardReveal(index, category.id, category.text)}
                   />
                 ))}
               </div>
@@ -192,7 +198,7 @@ const Index = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {getCurrentActivities().map((activity, index) => (
                   <ActivityCard
-                    key={`${activity.id}-${index}-${Math.random()}`}
+                    key={activity.id}
                     title={`${activity.emoji} ${activity.text}`}
                     isRevealed={revealedCards.has(index)}
                     onClick={() => handleCardReveal(index, activity.id, `${activity.emoji} ${activity.text}`)}
@@ -210,10 +216,10 @@ const Index = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {subOptions.map((option, index) => (
                   <ActivityCard
-                    key={`${option}-${index}-${Math.random()}`}
+                    key={option}
                     title={option}
                     isRevealed={revealedCards.has(index)}
-                    onClick={() => handleCardReveal(index)}
+                    onClick={() => handleCardReveal(index, option, option)}
                   />
                 ))}
               </div>
@@ -231,6 +237,7 @@ const Index = () => {
                 </p>
                 <p className="text-xl">
                   {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivityText || selectedActivity}
+                  {selectedSubOption && ` • ${selectedSubOption}`}
                 </p>
                 {subOptions.length > 0 && (
                   <p className="text-lg mt-4 opacity-90">
