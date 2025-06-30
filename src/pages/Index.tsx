@@ -1,17 +1,14 @@
+// src/pages/Index.tsx
 import React, { useState, useEffect } from 'react';
 import QuestionStep from '../components/QuestionStep';
 import ActivityCard from '../components/ActivityCard';
 import FortuneWheel from '../components/FortuneWheel';
 import DrinkBottle from '../components/DrinkBottle';
-import { 
-  initialQuestions, 
-  mainCategories, 
-  homeActivities, 
-  outsideActivities,
-  netflixOptions,
-  musicOptions,
-  cookingOptions,
-  gameOptions
+import {
+  initialQuestions,
+  mainCategories,
+  homeActivities,
+  outsideActivities
 } from '../data/activities';
 
 type GameState = 'questions' | 'main-category' | 'activities' | 'sub-activities' | 'result' | 'food-drink';
@@ -24,15 +21,13 @@ const Index: React.FC = () => {
   const [revealedCards, setRevealedCards] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedActivity, setSelectedActivity] = useState<string>('');
-  const [selectedActivityText, setSelectedActivityText] = useState<string>('');
   const [subOptions, setSubOptions] = useState<string[]>([]);
   const [selectedSubOption, setSelectedSubOption] = useState<string>('');
   const [shuffledCategories, setShuffledCategories] = useState(mainCategories);
 
-  // Shuffle categories on mount and when resetting to questions
+  // Tasowanie kategorii przy starcie i resecie
   useEffect(() => {
-    const shuffled = [...mainCategories].sort(() => Math.random() - 0.5);
-    setShuffledCategories(shuffled);
+    setShuffledCategories([...mainCategories].sort(() => Math.random() - 0.5));
   }, [gameState]);
 
   const handleAnswer = (answerId: string) => {
@@ -42,83 +37,37 @@ const Index: React.FC = () => {
     if (currentQuestionIndex < initialQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // prepare for category selection
       setRevealedCards(new Set());
-      setSelectedSubOption('');
       setGameState('main-category');
     }
   };
 
-  const handleCardReveal = (
-    index: number,
-    cardId?: string,
-    cardText?: string
-  ) => {
+  const handleCardReveal = (index: number, cardId?: string, cardText?: string) => {
     if (revealedCards.has(index)) return;
-
-    // reveal animation
     setRevealedCards(prev => new Set(prev).add(index));
 
     setTimeout(() => {
       if (gameState === 'main-category') {
-        // select where
         setSelectedCategory(cardId || '');
-        // reset next-phase states
-        setSelectedActivity('');
-        setSelectedActivityText('');
-        setSubOptions([]);
-        setSelectedSubOption('');
         setGameState('activities');
         setRevealedCards(new Set());
       } else if (gameState === 'activities') {
-        // select activity
         setSelectedActivity(cardId || '');
-        setSelectedActivityText(cardText || '');
-        handleActivitySelection(cardId || '');
+        setSubOptions(generateSubOptions(cardId || '', cardText || ''));
+        setGameState('sub-activities');
+        setRevealedCards(new Set());
       } else if (gameState === 'sub-activities') {
-        // select detail
         setSelectedSubOption(cardText || '');
         setGameState('result');
       }
     }, 2000);
   };
 
-  const handleActivitySelection = (activityId: string) => {
-    let options: string[] = [];
-    switch (activityId) {
-      case 'netflix':
-      case 'movie-marathon':
-        options = netflixOptions;
-        break;
-      case 'music':
-        options = musicOptions;
-        break;
-      case 'cooking':
-      case 'cooking-fancy':
-      case 'cooking-course':
-        options = cookingOptions;
-        break;
-      case 'games':
-      case 'board-games':
-        options = gameOptions;
-        break;
-      default:
-        // no sub-options
-        setSubOptions([]);
-        setSelectedSubOption('');
-        setGameState('result');
-        return;
-    }
-
-    if (options.length > 0) {
-      setSubOptions(options);
-      setRevealedCards(new Set());
-      setGameState('sub-activities');
-    } else {
-      setSubOptions([]);
-      setSelectedSubOption('');
-      setGameState('result');
-    }
+  // Tworzy format: czas-typAktywności-lokalizacja-nazwa
+  const generateSubOptions = (activityId: string, activityText: string) => {
+    const time = answers.time as TimeChoice;
+    const location = selectedCategory;
+    return [`${time}-${activityId}-${location}-${activityText}`];
   };
 
   const getCurrentActivities = () => {
@@ -134,7 +83,6 @@ const Index: React.FC = () => {
     setRevealedCards(new Set());
     setSelectedCategory('');
     setSelectedActivity('');
-    setSelectedActivityText('');
     setSubOptions([]);
     setSelectedSubOption('');
   };
@@ -167,12 +115,7 @@ const Index: React.FC = () => {
               <h2 className="text-3xl font-bold holographic">Gdzie chcecie spędzić czas?</h2>
               <div className="flex justify-center space-x-8">
                 {shuffledCategories.map((cat, idx) => (
-                  <ActivityCard
-                    key={cat.id}
-                    title={`${cat.emoji} ${cat.text}`}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, cat.id, cat.text)}
-                  />
+                  <ActivityCard key={cat.id} title={`${cat.emoji} ${cat.text}`} isRevealed={revealedCards.has(idx)} onClick={() => handleCardReveal(idx, cat.id, cat.text)} />
                 ))}
               </div>
             </div>
@@ -183,12 +126,7 @@ const Index: React.FC = () => {
               <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
                 {getCurrentActivities().map((act, idx) => (
-                  <ActivityCard
-                    key={act.id}
-                    title={`${act.emoji} ${act.text}`}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, act.id, `${act.emoji} ${act.text}`)}
-                  />
+                  <ActivityCard key={`${act.id}-${idx}`} title={`${act.emoji} ${act.text}`} isRevealed={revealedCards.has(idx)} onClick={() => handleCardReveal(idx, act.id, act.text)} />
                 ))}
               </div>
             </div>
@@ -196,15 +134,10 @@ const Index: React.FC = () => {
 
           {gameState === 'sub-activities' && (
             <div className="text-center space-y-8">
-              <h2 className="text-3xl font-bold holographic">Wybierz szczegóły!</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
+              <h2 className="text-3xl font-bold holographic">Szczegóły aktywności</h2>
+              <div className="grid grid-cols-1 gap-6 justify-items-center">
                 {subOptions.map((opt, idx) => (
-                  <ActivityCard
-                    key={opt}
-                    title={opt}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, opt, opt)}
-                  />
+                  <ActivityCard key={opt} title={opt} isRevealed={revealedCards.has(idx)} onClick={() => handleCardReveal(idx, opt, opt)} />
                 ))}
               </div>
             </div>
@@ -214,16 +147,9 @@ const Index: React.FC = () => {
             <div className="text-center space-y-8">
               <h2 className="text-4xl font-bold holographic">Świetny wybór! 🎉</h2>
               <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
-                <p className="text-2xl mb-4">Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:</p>
-                <p className="text-xl">
-                  {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivityText || selectedActivity}
-                  {selectedSubOption && ` • ${selectedSubOption}`}
-                </p>
-                <p className="text-lg mt-4 opacity-90">Perfect dla was! Spędźcie razem cudowny czas! 💕</p>
+                <p className="text-2xl mb-4">Plan: <strong>{selectedSubOption}</strong></p>
               </div>
-              <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">
-                Zagraj ponownie! 🎮
-              </button>
+              <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">Zagraj ponownie! 🎮</button>
             </div>
           )}
 
@@ -234,9 +160,7 @@ const Index: React.FC = () => {
                 <DrinkBottle />
               </div>
               <div className="text-center">
-                <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">
-                  Powrót do gry 🎯
-                </button>
+                <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">Powrót do gry 🎯</button>
               </div>
             </div>
           )}
