@@ -18,6 +18,7 @@ type GameState = 'questions' | 'main-category' | 'activities' | 'sub-activities'
 type TimeChoice = 'short' | 'medium' | 'long';
 
 const Index: React.FC = () => {
+  // --- State ---
   const [gameState, setGameState] = useState<GameState>('questions');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -26,27 +27,27 @@ const Index: React.FC = () => {
   const [revealedCards, setRevealedCards] = useState<Set<number>>(new Set());
 
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategoryText, setSelectedCategoryText] = useState<string>('');
   const [selectedActivityText, setSelectedActivityText] = useState<string>('');
   const [subOptions, setSubOptions] = useState<string[]>([]);
   const [selectedSubOption, setSelectedSubOption] = useState<string>('');
 
-  // Derive selected category object for display
-  const selectedCategoryObj = mainCategories.find(cat => cat.id === selectedCategory);
-
-  // Shuffle on mount or when resetting to questions
+  // --- Effects ---
+  // Shuffle categories when resetting to questions
   useEffect(() => {
     if (gameState === 'questions') {
       setShuffledCategories([...mainCategories].sort(() => Math.random() - 0.5));
     }
   }, [gameState]);
 
-  // Clear revealed cards on phase change
+  // Clear revealed cards on new phase
   useEffect(() => {
     if (['main-category', 'activities', 'sub-activities'].includes(gameState)) {
       setRevealedCards(new Set());
     }
   }, [gameState]);
 
+  // --- Handlers ---
   const handleAnswer = (answerId: string) => {
     const question = initialQuestions[currentQuestionIndex];
     setAnswers(prev => ({ ...prev, [question.id]: answerId }));
@@ -73,10 +74,14 @@ const Index: React.FC = () => {
 
   const handleCardReveal = (idx: number, id?: string, text?: string) => {
     if (revealedCards.has(idx)) return;
+    // Flip the clicked card
     setRevealedCards(prev => new Set(prev).add(idx));
+
+    // After reveal animation, advance phase
     setTimeout(() => {
       if (gameState === 'main-category') {
         setSelectedCategory(id || '');
+        setSelectedCategoryText(text || '');
         setGameState('activities');
       } else if (gameState === 'activities') {
         setSelectedActivityText(text || '');
@@ -91,7 +96,7 @@ const Index: React.FC = () => {
         setSelectedSubOption(text || '');
         setGameState('result');
       }
-    }, 1000);
+    }, 800); // match your CSS flip duration (e.g. 800ms)
   };
 
   const resetGame = () => {
@@ -99,6 +104,7 @@ const Index: React.FC = () => {
     setCurrentQuestionIndex(0);
     setAnswers({});
     setSelectedCategory('');
+    setSelectedCategoryText('');
     setSelectedActivityText('');
     setSubOptions([]);
     setSelectedSubOption('');
@@ -107,6 +113,7 @@ const Index: React.FC = () => {
 
   const goToFoodDrink = () => setGameState('food-drink');
 
+  // --- UI ---
   return (
     <div className="min-h-screen y2k-bg flex flex-col items-center justify-center p-4 font-quicksand">
       <div className="max-w-6xl w-full">
@@ -121,10 +128,12 @@ const Index: React.FC = () => {
         </div>
 
         <div className="glass-effect rounded-3xl p-8 min-h-96">
+          {/* Questions */}
           {gameState === 'questions' && (
             <QuestionStep question={initialQuestions[currentQuestionIndex]} onAnswer={handleAnswer} />
           )}
 
+          {/* Main Category */}
           {gameState === 'main-category' && (
             <div className="text-center space-y-8">
               <h2 className="text-3xl font-bold holographic">Gdzie chcecie spędzić czas?</h2>
@@ -134,13 +143,14 @@ const Index: React.FC = () => {
                     key={cat.id}
                     title={`${cat.emoji} ${cat.text}`}
                     isRevealed={revealedCards.has(i)}
-                    onClick={() => handleCardReveal(i, cat.id, cat.text)}
+                    onClick={() => handleCardReveal(i, cat.id, `${cat.emoji} ${cat.text}`)}
                   />
                 ))}
               </div>
             </div>
           )}
 
+          {/* Activities */}
           {gameState === 'activities' && (
             <div className="text-center space-y-8">
               <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
@@ -157,6 +167,7 @@ const Index: React.FC = () => {
             </div>
           )}
 
+          {/* Sub-Activities */}
           {gameState === 'sub-activities' && (
             <div className="text-center space-y-8">
               <h2 className="text-3xl font-bold holographic">Wybierz szczegóły!</h2>
@@ -173,18 +184,16 @@ const Index: React.FC = () => {
             </div>
           )}
 
+          {/* Result */}
           {gameState === 'result' && (
             <div className="text-center space-y-8">
               <h2 className="text-4xl font-bold holographic">Świetny wybór! 🎉</h2>
               <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
-                <p className="text-2xl mb-4">Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:</p>
+                <p className="text-2xl mb-4">
+                  Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:
+                </p>
                 <p className="text-xl">
-                  {selectedCategoryObj
-                    ? `${selectedCategoryObj.emoji} ${selectedCategoryObj.text}`
-                    : selectedCategory === 'home'
-                      ? '🏠 W domu'
-                      : '🌳 Na zewnątrz'}
-                  {' • '}{selectedActivityText}
+                  {selectedCategoryText} • {selectedActivityText}
                   {selectedSubOption && ` • ${selectedSubOption}`}
                 </p>
               </div>
@@ -194,6 +203,7 @@ const Index: React.FC = () => {
             </div>
           )}
 
+          {/* Food & Drink */}
           {gameState === 'food-drink' && (
             <div className="space-y-12">
               <div className="grid md:grid-cols-2 gap-12">
