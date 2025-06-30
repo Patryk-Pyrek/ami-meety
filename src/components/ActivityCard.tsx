@@ -1,6 +1,5 @@
 // src/components/ActivityCard.tsx
 import React from 'react';
-import './ActivityCard.css'; 
 
 type ActivityCardProps = {
   title: string;
@@ -10,14 +9,18 @@ type ActivityCardProps = {
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ title, isRevealed, onClick }) => (
   <div
-    className={`activity-card ${isRevealed ? 'revealed' : ''}`}
+    className={`card-flip w-32 h-32 cursor-pointer ${isRevealed ? 'card-flipped' : ''}`}
     onClick={onClick}
   >
-    <div className="card-front glass-effect">
-      <p className="text-2xl font-bold">?</p>
-    </div>
-    <div className="card-back glass-effect">
-      <p className="text-lg font-semibold">{title}</p>
+    <div className="card-inner">
+      <div className="card-front glass-effect flex items-center justify-center shadow-lg neon-glow">
+        <div className="text-6xl">💖</div>
+      </div>
+      <div className="card-back glass-effect flex items-center justify-center shadow-lg p-2">
+        <span className="text-gray-700 font-bold text-sm text-center leading-tight">
+          {title}
+        </span>
+      </div>
     </div>
   </div>
 );
