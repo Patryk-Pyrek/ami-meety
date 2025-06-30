@@ -156,76 +156,159 @@ const Index: React.FC = () => {
           <button onClick={goToFoodDrink} className="cyber-button px-8 py-4 rounded-lg text-white font-bold hover:scale-105 transition-all min-w-[160px]">🍕🥤 Jedzenie & Napoje</button>
         </div>
 
-        {/* Main Content */}
-        <div className="glass-effect rounded-3xl p-8 min-h-96">
-          {gameState === 'questions' && (
-            <QuestionStep question={initialQuestions[currentQuestionIndex]} onAnswer={handleAnswer} />
-          )}
+import React, { useState } from 'react';
+import QuestionStep from './QuestionStep';
+import ActivityCard from './ActivityCard';
 
-          {gameState === 'main-category' && (
-            <div className="text-center space-y-8">
-              <h2 className="text-3xl font-bold holographic">Gdzie chcecie spędzić czas?</h2>
-              <div className="flex justify-center space-x-8">
-                {shuffledCategories.map((cat, idx) => (
-                  <ActivityCard
-                    key={cat.id}
-                    title={`${cat.emoji} ${cat.text}`}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, cat.id, cat.text)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+export default function ActivityPicker() {
+  const [gameState, setGameState] = useState('questions');
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState({ mood: null });
 
-          {gameState === 'activities' && (
-            <div className="text-center space-y-8">
-              <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
-                {getCurrentActivities().map((act, idx) => (
-                  <ActivityCard
-                    key={act.id}
-                    title={`${act.emoji} ${act.text}`}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, act.id, `${act.emoji} ${act.text}`)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+  const [shuffledCategories, setShuffledCategories] = useState([]);
+  const [revealedCards, setRevealedCards] = useState(new Set());
 
-          {gameState === 'sub-activities' && (
-            <div className="text-center space-y-8">
-              <h2 className="text-3xl font-bold holographic">Wybierz szczegóły!</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
-                {subOptions.map((opt, idx) => (
-                  <ActivityCard
-                    key={opt}
-                    title={opt}
-                    isRevealed={revealedCards.has(idx)}
-                    onClick={() => handleCardReveal(idx, opt, opt)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategoryText, setSelectedCategoryText] = useState('');
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [selectedActivityText, setSelectedActivityText] = useState('');
+  const [selectedSubOption, setSelectedSubOption] = useState('');
 
-          {gameState === 'result' && (
-            <div className="text-center space-y-8">
-              <h2 className="text-4xl font-bold holographic">Świetny wybór! 🎉</h2>
-              <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
-                <p className="text-2xl mb-4">Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:</p>
-                <p className="text-xl">
-                  {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivityText || selectedActivity}
-                  {selectedSubOption && ` • ${selectedSubOption}`}
-                </p>
-                <p className="text-lg mt-4 opacity-90">Perfect dla was! Spędźcie razem cudowny czas! 💕</p>
-              </div>
-              <button onClick={resetGame} className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all">
-                Zagraj ponownie! 🎮
-              </button>
-            </div>
-          )}
+  const initialQuestions = [ /* ... */ ];
+  const categories = [ /* ... */ ]; // Each has { id, emoji, text, activities }
+
+  function handleAnswer(answer) {
+    setAnswers(prev => ({ ...prev, ...answer }));
+    if (currentQuestionIndex < initialQuestions.length - 1) {
+      setCurrentQuestionIndex(i => i + 1);
+    } else {
+      // Shuffle and move to categories
+      const shuffled = [...categories].sort(() => Math.random() - 0.5);
+      setShuffledCategories(shuffled);
+      setGameState('main-category');
+    }
+  }
+
+  function getCurrentActivities() {
+    const cat = categories.find(c => c.id === selectedCategory);
+    return cat ? cat.activities : [];
+  }
+
+  function handleCardReveal(idx, id, text) {
+    setRevealedCards(prev => new Set(prev).add(idx));
+
+    if (gameState === 'main-category') {
+      setSelectedCategory(id);
+      setSelectedCategoryText(text);
+      setGameState('activities');
+    } else if (gameState === 'activities') {
+      setSelectedActivity(id);
+      setSelectedActivityText(text);
+      setGameState('sub-activities');
+    } else if (gameState === 'sub-activities') {
+      setSelectedSubOption(text);
+      setGameState('result');
+    }
+  }
+
+  function resetGame() {
+    setGameState('questions');
+    setCurrentQuestionIndex(0);
+    setAnswers({ mood: null });
+    setShuffledCategories([]);
+    setRevealedCards(new Set());
+    setSelectedCategory(null);
+    setSelectedCategoryText('');
+    setSelectedActivity(null);
+    setSelectedActivityText('');
+    setSelectedSubOption('');
+  }
+
+  const subOptions = ['Option A', 'Option B', 'Option C'];
+
+  return (
+    <div className="glass-effect rounded-3xl p-8 min-h-96">
+      {gameState === 'questions' && (
+        <QuestionStep
+          question={initialQuestions[currentQuestionIndex]}
+          onAnswer={handleAnswer}
+        />
+      )}
+
+      {gameState === 'main-category' && (
+        <div className="text-center space-y-8">
+          <h2 className="text-3xl font-bold holographic">
+            Gdzie chcecie spędzić czas?
+          </h2>
+          <div className="flex justify-center space-x-8">
+            {shuffledCategories.map((cat, idx) => (
+              <ActivityCard
+                key={cat.id}
+                title={`${cat.emoji} ${cat.text}`}
+                isRevealed={revealedCards.has(idx)}
+                onClick={() => handleCardReveal(idx, cat.id, `${cat.emoji} ${cat.text}`)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {gameState === 'activities' && (
+        <div className="text-center space-y-8">
+          <h2 className="text-3xl font-bold holographic">Wybierz aktywność!</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
+            {getCurrentActivities().map((act, idx) => (
+              <ActivityCard
+                key={act.id}
+                title={`${act.emoji} ${act.text}`}
+                isRevealed={revealedCards.has(idx)}
+                onClick={() => handleCardReveal(idx, act.id, `${act.emoji} ${act.text}`)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {gameState === 'sub-activities' && (
+        <div className="text-center space-y-8">
+          <h2 className="text-3xl font-bold holographic">Wybierz szczegóły!</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
+            {subOptions.map((opt, idx) => (
+              <ActivityCard
+                key={opt}
+                title={opt}
+                isRevealed={revealedCards.has(idx)}
+                onClick={() => handleCardReveal(idx, opt, opt)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {gameState === 'result' && (
+        <div className="text-center space-y-8">
+          <h2 className="text-4xl font-bold holographic">Świetny wybór! 🎉</h2>
+          <div className="bg-gradient-to-r from-pink-300 to-rose-400 text-white p-8 rounded-xl neon-glow">
+            <p className="text-2xl mb-4">
+              Wasz plan na {answers.mood === 'romantic' ? 'romantyczny' : 'wspaniały'} czas:
+            </p>
+            <p className="text-xl">
+              {selectedCategory === 'home' ? '🏠 W domu' : '🌳 Na zewnątrz'} • {selectedActivityText}
+              {selectedSubOption && ` • ${selectedSubOption}`}
+            </p>
+          </div>
+          <button
+            onClick={resetGame}
+            className="cyber-button px-8 py-4 rounded-lg text-white font-bold text-xl hover:scale-105 transition-all"
+          >
+            Zagraj ponownie! 🎮
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
           {gameState === 'food-drink' && (
             <div className="space-y-12">
